@@ -14,7 +14,7 @@ import storage from 'redux-persist/lib/storage';
 import { APi } from "./CenteralAPI.jsx";
 import authReducer from "./auth.jsx";
 import webState from "./WebState.jsx";
-
+import { rtkQueryErrorLogger } from './middleware';
 const rootReducer = combineReducers({
   'webState': webState,
   'auth': authReducer,
@@ -37,7 +37,7 @@ export const store = configureStore({
       serializableCheck: {
         ignoredActions: [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER],
       },
-    }).concat(APi.middleware);
+    }).concat(APi.middleware,rtkQueryErrorLogger);
   }
 });
 

@@ -9,18 +9,24 @@ import {
 } from "recharts";
 import { useSelector } from "react-redux";
 
-const trafficData = [
-  { name: "Mon", traffic: 4000 },
-  { name: "Tue", traffic: 3000 },
-  { name: "Wed", traffic: 2000 },
-  { name: "Thu", traffic: 2780 },
-  { name: "Fri", traffic: 1890 },
-  { name: "Sat", traffic: 2390 },
-  { name: "Sun", traffic: 3490 },
-];
-
-export default function TrafficChart() {
+export default function TrafficChart({ data }) {
   const { DarkMode } = useSelector((state) => state.webState);
+
+  // Fallback data structure to prevent layout shift during load
+  const chartData = data || [
+    { name: "Mon", traffic: 0 },
+    { name: "Tue", traffic: 0 },
+    { name: "Wed", traffic: 0 },
+    { name: "Thu", traffic: 0 },
+    { name: "Fri", traffic: 0 },
+    { name: "Sat", traffic: 0 },
+    { name: "Sun", traffic: 0 },
+  ];
+
+  // Calculate total sessions for the header summary
+  const totalTraffic = data 
+    ? data.reduce((acc, curr) => acc + curr.traffic, 0).toLocaleString() 
+    : "0";
 
   return (
     <div className={`border rounded-2xl p-6 h-80 transition-all duration-300 flex flex-col ${
@@ -35,7 +41,9 @@ export default function TrafficChart() {
           <h3 className={`font-semibold text-lg tracking-tight ${DarkMode ? "text-slate-100" : "text-slate-800"}`}>
             Network Traffic
           </h3>
-          <p className="text-slate-500 text-xs font-medium">Gbps throughput per day</p>
+          <p className="text-slate-500 text-xs font-medium">
+            Total Sessions: <span className="font-bold text-emerald-500">{totalTraffic}</span>
+          </p>
         </div>
         <div className="flex gap-2 items-center">
           <div className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" />
@@ -48,7 +56,7 @@ export default function TrafficChart() {
       {/* Chart Section */}
       <div className="flex-1 w-full">
         <ResponsiveContainer width="100%" height="100%">
-          <BarChart data={trafficData} margin={{ top: 0, right: 0, left: -20, bottom: 0 }}>
+          <BarChart data={chartData} margin={{ top: 0, right: 0, left: -20, bottom: 0 }}>
             <defs>
               <linearGradient id="barGradient" x1="0" y1="0" x2="0" y2="1">
                 <stop offset="0%" stopColor="#10b981" stopOpacity={DarkMode ? 1 : 0.8} />
@@ -56,7 +64,6 @@ export default function TrafficChart() {
               </linearGradient>
             </defs>
             
-            {/* Dynamic Grid Color */}
             <CartesianGrid 
               strokeDasharray="3 3" 
               vertical={false} 
@@ -87,6 +94,7 @@ export default function TrafficChart() {
                 boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)'
               }}
               itemStyle={{ color: DarkMode ? '#10b981' : '#059669' }}
+              formatter={(value) => [value, "Sessions"]}
             />
             
             <Bar 
@@ -94,6 +102,9 @@ export default function TrafficChart() {
               fill="url(#barGradient)" 
               radius={[6, 6, 0, 0]} 
               barSize={28}
+              animationBegin={200}
+              animationDuration={1200}
+              animationEasing="ease-out"
             />
           </BarChart>
         </ResponsiveContainer>

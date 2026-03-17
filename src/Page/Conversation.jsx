@@ -6,12 +6,22 @@ import ChatList from "../Component/ConversationComponent/ChatList";
 import ChatWindow from "../Component/ConversationComponent/ChatWindow";
 import Header from "../Component/header";
 import { logout } from "../Redux/auth";
-import { useNavigate } from "react-router-dom";
+import { useNavigate,useLocation } from "react-router-dom";
 
 export default function Conversations() {
   const dispatch = useDispatch();
   const { DarkMode } = useSelector((state) => state.webState);
   const navigate = useNavigate();
+  const location=useLocation()
+  const id=location.state?.id
+
+  useEffect(()=>{
+    console.log("what is id")
+    console.log(id)
+ if(id){
+  setSelectedSessionId(id)
+ }
+  },[id])
   // State to track which visitor chat is currently open
   const [selectedSessionId, setSelectedSessionId] = useState(null);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -79,7 +89,7 @@ const { isAuthenticate } = useSelector((state) => state.auth);
           </div>
 
           {/* Column 2: The Chat Window (Messages) */}
-          <div className={`flex-1 flex flex-col min-w-0 ${
+          <div className={`flex-1 ${ DarkMode ? " bg-slate-900/50" : " bg-white"} flex flex-col min-w-0 ${
             !selectedSessionId ? "hidden md:flex items-center justify-center bg-slate-50 dark:bg-slate-900/30" : "flex"
           }`}>
             {selectedSessionId ? (
@@ -88,7 +98,7 @@ const { isAuthenticate } = useSelector((state) => state.auth);
                 onBack={() => setSelectedSessionId(null)} // Mobile "Go Back"
               />
             ) : (
-              <div className="text-center p-8">
+              <div className={`text-center ${ DarkMode ? " bg-slate-900/50" : " bg-white"} p-8`}>
                 <div className="w-16 h-16 bg-blue-100 dark:bg-blue-900/30 text-blue-600 rounded-full flex items-center justify-center mx-auto mb-4">
                   <Bot size={32} />
                 </div>

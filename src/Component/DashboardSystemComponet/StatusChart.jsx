@@ -1,16 +1,21 @@
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer, Legend } from "recharts";
 import { useSelector } from "react-redux";
 
-const statusData = [
-  { name: "Active", value: 65 },
-  { name: "Maintenance", value: 20 },
-  { name: "Critical", value: 15 },
-];
-
+// Matching your brand colors: Blue (Active), Yellow (Maintenance), Red (Inactive/Critical)
 const COLORS = ["#3b82f6", "#facc15", "#ef4444"]; 
 
-export default function StatusChart() {
+export default function StatusChart({ data }) {
   const { DarkMode } = useSelector((state) => state.webState);
+
+  // Fallback data structure
+  const chartData = data || [
+    { name: "Active", value: 0 },
+    { name: "Maintenance", value: 0 },
+    { name: "Inactive", value: 0 },
+  ];
+
+  // Calculate total for the center label
+  const totalItems = chartData.reduce((acc, curr) => acc + curr.value, 0);
 
   return (
     <div className={`border rounded-2xl p-6 h-[350px] transition-all duration-300 flex flex-col ${
@@ -22,7 +27,7 @@ export default function StatusChart() {
       {/* Header Section */}
       <div className="flex justify-between items-center mb-6">
         <h3 className={`font-semibold tracking-wide ${DarkMode ? "text-slate-100" : "text-slate-800"}`}>
-          System Status
+          Organization Status
         </h3>
         <span className={`text-[10px] px-2 py-1 rounded uppercase font-bold tracking-tighter ${
           DarkMode ? "bg-slate-800 text-slate-400" : "bg-slate-100 text-slate-500"
@@ -32,23 +37,32 @@ export default function StatusChart() {
       </div>
 
       {/* Chart Section */}
-      <div className="flex-1 w-full">
+      <div className="flex-1 w-full relative">
+        {/* Total Label in the center of the Donut */}
+        <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none pb-8">
+          <span className={`text-2xl font-bold ${DarkMode ? "text-white" : "text-slate-800"}`}>
+            {totalItems}
+          </span>
+          <span className="text-[10px] uppercase text-slate-500 font-bold">Total</span>
+        </div>
+
         <ResponsiveContainer width="100%" height="100%">
           <PieChart>
             <Pie
-              data={statusData}
+              data={chartData}
               innerRadius={70}
               outerRadius={90}
               paddingAngle={5}
               dataKey="value"
               stroke="none"
+              animationBegin={400}
+              animationDuration={1500}
             >
-              {statusData.map((entry, index) => (
+              {chartData.map((entry, index) => (
                 <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
               ))}
             </Pie>
             
-            {/* Dynamic Tooltip */}
             <Tooltip 
               contentStyle={{ 
                 backgroundColor: DarkMode ? '#0f172a' : '#ffffff', 
@@ -57,10 +71,10 @@ export default function StatusChart() {
                 fontSize: '12px',
                 boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)'
               }}
-              itemStyle={{ color: DarkMode ? '#94a3b8' : '#64748b' }}
+              itemStyle={{ color: DarkMode ? '#f8fafc' : '#1e293b' }}
+              formatter={(value) => [value, "Companies"]}
             />
             
-            {/* Professional Legend */}
             <Legend 
               verticalAlign="bottom" 
               height={36} 

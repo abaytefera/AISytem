@@ -1,7 +1,13 @@
-import { TrendingUp, ArrowUpRight } from "lucide-react";
+import { TrendingUp, ArrowUpRight, Minus } from "lucide-react";
 import { useSelector } from "react-redux";
 
-export default function StatCard({ title, value, trend = "+12%", description = "vs last month" }) {
+export default function StatCard({ 
+  title, 
+  value, 
+  trend = "0%", 
+  description = "vs previous period",
+  isPositive = true // New prop to handle negative trends (e.g., server downtime)
+}) {
   const { DarkMode } = useSelector((state) => state.webState);
 
   return (
@@ -21,7 +27,7 @@ export default function StatCard({ title, value, trend = "+12%", description = "
           <h3 className={`text-3xl font-bold tracking-tight ${
             DarkMode ? "text-white" : "text-slate-900"
           }`}>
-            {value}
+            {value?.toLocaleString() || 0}
           </h3>
         </div>
         
@@ -38,11 +44,15 @@ export default function StatCard({ title, value, trend = "+12%", description = "
       {/* Trend Indicator */}
       <div className="flex items-center gap-2">
         <span className={`flex items-center text-xs font-bold px-2 py-0.5 rounded-full ${
-          DarkMode 
-            ? "text-emerald-400 bg-emerald-400/10" 
-            : "text-emerald-600 bg-emerald-50"
+          isPositive 
+            ? (DarkMode ? "text-emerald-400 bg-emerald-400/10" : "text-emerald-600 bg-emerald-50")
+            : (DarkMode ? "text-rose-400 bg-rose-400/10" : "text-rose-600 bg-rose-50")
         }`}>
-          <TrendingUp size={12} className="mr-1" />
+          {trend !== "0%" ? (
+            <TrendingUp size={12} className={`mr-1 ${!isPositive && "rotate-180"}`} />
+          ) : (
+            <Minus size={12} className="mr-1" />
+          )}
           {trend}
         </span>
         <span className={`text-xs italic ${

@@ -9,18 +9,20 @@ import {
 } from "recharts";
 import { useSelector } from "react-redux";
 
-const uptimeData = [
-  { name: "00:00", uptime: 99.1 },
-  { name: "04:00", uptime: 99.5 },
-  { name: "08:00", uptime: 98.2 },
-  { name: "12:00", uptime: 99.9 },
-  { name: "16:00", uptime: 99.4 },
-  { name: "20:00", uptime: 99.8 },
-  { name: "23:59", uptime: 99.7 },
-];
-
-export default function UptimeChart() {
+// Accept 'data' as a prop from the Dashboard
+export default function UptimeChart({ data }) {
   const { DarkMode } = useSelector((state) => state.webState);
+
+  // Fallback data for smooth rendering
+  const chartData = data || [
+    { name: "00:00", uptime: 100 },
+    { name: "23:59", uptime: 100 },
+  ];
+
+  // Calculate real-time average from the data
+  const averageUptime = data 
+    ? (data.reduce((acc, curr) => acc + curr.uptime, 0) / data.length).toFixed(2)
+    : "100";
 
   return (
     <div className={`border rounded-2xl p-6 h-80 transition-all duration-300 ${
@@ -37,7 +39,7 @@ export default function UptimeChart() {
         </div>
         <div className="text-right">
           <span className={`font-mono text-lg font-bold ${DarkMode ? "text-blue-400" : "text-blue-600"}`}>
-            99.98%
+            {averageUptime}%
           </span>
           <p className="text-[10px] text-slate-500 uppercase tracking-widest font-medium">Average</p>
         </div>
@@ -45,7 +47,7 @@ export default function UptimeChart() {
 
       <div className="flex-1 h-56 w-full">
         <ResponsiveContainer width="100%" height="100%">
-          <AreaChart data={uptimeData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+          <AreaChart data={chartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
             <defs>
               <linearGradient id="colorUptime" x1="0" y1="0" x2="0" y2="1">
                 <stop offset="5%" stopColor="#3b82f6" stopOpacity={DarkMode ? 0.3 : 0.15} />
@@ -82,6 +84,7 @@ export default function UptimeChart() {
                 color: DarkMode ? '#f8fafc' : '#1e293b',
                 boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)'
               }}
+              formatter={(value) => [`${value}%`, "Uptime"]}
             />
             
             <Area
@@ -91,6 +94,7 @@ export default function UptimeChart() {
               strokeWidth={3}
               fillOpacity={1}
               fill="url(#colorUptime)"
+              animationDuration={1500}
               activeDot={{ 
                 r: 6, 
                 strokeWidth: 2, 
@@ -103,4 +107,4 @@ export default function UptimeChart() {
       </div>
     </div>
   );
-} 
+}
