@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { Menu, RefreshCcw } from "lucide-react";
-import { logout } from "../Redux/auth";
+
 
 import { useGetSystemStatsQuery } from "../Redux/dashboard";
 
@@ -13,7 +13,7 @@ import UptimeChart from "../Component/DashboardSystemComponet/UptimeChart";
 import TrafficChart from "../Component/DashboardSystemComponet/TrafficChart";
 import StatusChart from "../Component/DashboardSystemComponet/StatusChart";
 import Header from "../Component/header";
-
+import { logout } from "../Redux/auth";
 export default function DashboardSystem() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
